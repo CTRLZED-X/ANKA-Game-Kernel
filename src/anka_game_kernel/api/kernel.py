@@ -7,6 +7,7 @@ from anka_game_kernel.domain.ids import MapId
 from anka_game_kernel.domain.maps import MapDefinition
 from anka_game_kernel.knowledge.pack import KnowledgePack, build_mapuse_knowledge_pack
 from anka_game_kernel.mechanics.aoe.service import AoEService
+from anka_game_kernel.mechanics.casting.service import CastAvailabilityService
 from anka_game_kernel.mechanics.geometry.service import GeometryService
 from anka_game_kernel.mechanics.los.service import LineOfSightService
 from anka_game_kernel.mechanics.range.service import RangeService
@@ -22,6 +23,7 @@ class GameKernel:
     los: LineOfSightService = field(default_factory=LineOfSightService)
     range: RangeService = field(default_factory=RangeService)
     targeting: TargetingService = field(default_factory=TargetingService)
+    casting: CastAvailabilityService = field(default_factory=CastAvailabilityService)
 
     @classmethod
     def load(cls, knowledge_pack: KnowledgePack) -> "GameKernel":

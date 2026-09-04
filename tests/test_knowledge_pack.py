@@ -10,6 +10,7 @@ from anka_game_kernel.domain.provenance import Provenance, SourceKind, Verificat
 from anka_game_kernel.errors import DefinitionNotFoundError, DuplicateDefinitionError
 from anka_game_kernel.knowledge.pack import build_mapuse_knowledge_pack
 from anka_game_kernel.mechanics.aoe import AreaShape, AreaSpec
+from anka_game_kernel.mechanics.casting import CastAvailabilityContext, CastAvailabilitySpec
 from anka_game_kernel.mechanics.geometry import GridCoordinate
 from anka_game_kernel.mechanics.range import RangeSpec
 from anka_game_kernel.mechanics.targeting import TargetCellContext, TargetCellSpec
@@ -181,6 +182,14 @@ def test_game_kernel_facade_exposes_pack_registries_and_delegated_geometry(tmp_p
         CellId(0),
         TargetCellSpec(),
         TargetCellContext(caster_cell=CellId(1), occupied_cells=frozenset()),
+    ).legal is True
+    assert kernel.casting.evaluate(
+        CastAvailabilitySpec(ap_cost=4, max_cast_per_turn=2),
+        CastAvailabilityContext(
+            current_ap=4,
+            casts_this_turn=1,
+            cooldown_remaining=0,
+        ),
     ).legal is True
     assert kernel.knowledge.manifest.pack_version == "pack-v1"
 
