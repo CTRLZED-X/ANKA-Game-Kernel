@@ -10,6 +10,7 @@ from anka_game_kernel.domain.provenance import Provenance, SourceKind, Verificat
 from anka_game_kernel.errors import DefinitionNotFoundError, DuplicateDefinitionError
 from anka_game_kernel.knowledge.pack import build_mapuse_knowledge_pack
 from anka_game_kernel.mechanics.geometry import GridCoordinate
+from anka_game_kernel.mechanics.range import RangeSpec
 from anka_game_kernel.registries.base import DefinitionRegistry
 
 
@@ -161,6 +162,9 @@ def test_game_kernel_facade_exposes_pack_registries_and_delegated_geometry(tmp_p
 
     assert kernel.maps.require(MapId(123)).map_id == MapId(123)
     assert kernel.geometry.cell_to_coordinate(CellId(14)) == GridCoordinate(1, 0)
+    assert kernel.range.evaluate(
+        CellId(0), CellId(14), RangeSpec(min_range=1, max_range=1)
+    ).legal is True
     assert kernel.knowledge.manifest.pack_version == "pack-v1"
 
 

@@ -7,6 +7,7 @@ from anka_game_kernel.domain.ids import MapId
 from anka_game_kernel.domain.maps import MapDefinition
 from anka_game_kernel.knowledge.pack import KnowledgePack, build_mapuse_knowledge_pack
 from anka_game_kernel.mechanics.geometry.service import GeometryService
+from anka_game_kernel.mechanics.range.service import RangeService
 from anka_game_kernel.registries.base import DefinitionRegistry
 
 
@@ -14,6 +15,7 @@ from anka_game_kernel.registries.base import DefinitionRegistry
 class GameKernel:
     knowledge: KnowledgePack
     geometry: GeometryService = field(default_factory=GeometryService)
+    range: RangeService = field(default_factory=RangeService)
 
     @classmethod
     def load(cls, knowledge_pack: KnowledgePack) -> "GameKernel":
