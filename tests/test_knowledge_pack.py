@@ -169,6 +169,12 @@ def test_game_kernel_facade_exposes_pack_registries_and_delegated_geometry(tmp_p
     assert kernel.aoe.cells(
         CellId(203), AreaSpec(shape=AreaShape.CROSS, radius=1)
     ).center == CellId(203)
+    assert kernel.los.evaluate(
+        kernel.maps.require(MapId(123)),
+        CellId(0),
+        CellId(0),
+        occupied_cells=frozenset(),
+    ).visible is True
     assert kernel.knowledge.manifest.pack_version == "pack-v1"
 
 
