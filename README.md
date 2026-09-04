@@ -2,33 +2,42 @@
 
 ANKA Game Kernel is the standalone, deterministic-first canonical library for reusable Dofus game knowledge and mechanics.
 
-## Current phase
+## Implemented foundation
 
-Phase 1 foundation is under construction. The repository currently establishes:
+The current Kernel provides:
 
-- immutable semantic ID types;
-- explicit certainty and verification metadata;
-- provenance-bearing canonical definitions;
-- a base deterministic mechanic result contract;
+- immutable semantic IDs and provenance/certainty metadata;
 - canonical map/cell definitions;
-- a strict `Mapuse` source adapter and directory loader.
+- strict `Mapuse` validation and normalization;
+- canonical 14×20 / 560-cell Dofus geometry;
+- immutable duplicate-safe definition registries;
+- deterministic Knowledge Pack manifests/fingerprints;
+- a small `GameKernel` facade exposing `kernel.maps` and `kernel.geometry`.
 
 ## `Mapuse` workflow
 
-Place every map needed by the active project in a `Mapuse` directory as `map_*.json`. The Kernel validates and normalizes those files without hard-coding map IDs into mechanics.
+Place every map needed by the active project in a `Mapuse` directory as `map_*.json`. Adding a new map is a data operation; geometry and mechanics do not hard-code map IDs.
 
 ```python
-from anka_game_kernel.knowledge.mapuse import load_mapuse_directory
+from anka_game_kernel import GameKernel
 
-maps = load_mapuse_directory(
+kernel = GameKernel.from_mapuse(
     r"C:\Users\dell\Desktop\ankabot\gamedata\Mapuse",
     source_version="local-export",
+    pack_version="local-pack-v1",
     game_version=None,
 )
 ```
+
+The Kernel validates each map, records SHA-256 provenance, normalizes it into canonical immutable definitions, and freezes those definitions into the Knowledge Pack map registry.
 
 ## Non-goals
 
 This repository intentionally excludes packet capture, protocol decoding, AnkaBot execution, live fight/world-state ownership, AI strategy, clicking/casting/movement execution, and evidence campaigns.
 
-See `docs/architecture/BOUNDARIES.md` and `docs/architecture/STATIC_DATA.md`.
+See:
+
+- `docs/architecture/BOUNDARIES.md`
+- `docs/architecture/STATIC_DATA.md`
+- `docs/architecture/GEOMETRY.md`
+- `docs/architecture/KNOWLEDGE_PACK.md`
