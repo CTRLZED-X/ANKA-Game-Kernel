@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anka-game-kernel"
+version = "0.1.0a1"
+description = "Deterministic-first canonical game knowledge and mechanics kernel for ANKA"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic>=2.13,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9,<10",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
