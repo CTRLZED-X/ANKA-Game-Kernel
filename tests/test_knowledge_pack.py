@@ -12,6 +12,7 @@ from anka_game_kernel.knowledge.pack import build_mapuse_knowledge_pack
 from anka_game_kernel.mechanics.aoe import AreaShape, AreaSpec
 from anka_game_kernel.mechanics.geometry import GridCoordinate
 from anka_game_kernel.mechanics.range import RangeSpec
+from anka_game_kernel.mechanics.targeting import TargetCellContext, TargetCellSpec
 from anka_game_kernel.registries.base import DefinitionRegistry
 
 
@@ -175,6 +176,12 @@ def test_game_kernel_facade_exposes_pack_registries_and_delegated_geometry(tmp_p
         CellId(0),
         occupied_cells=frozenset(),
     ).visible is True
+    assert kernel.targeting.evaluate_cell(
+        kernel.maps.require(MapId(123)),
+        CellId(0),
+        TargetCellSpec(),
+        TargetCellContext(caster_cell=CellId(1), occupied_cells=frozenset()),
+    ).legal is True
     assert kernel.knowledge.manifest.pack_version == "pack-v1"
 
 
