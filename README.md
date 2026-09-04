@@ -16,7 +16,8 @@ The current Kernel provides:
 - generic deterministic range/alignment evaluation with explicit typed failures;
 - deterministic point/lozenge/cross/diagonal AoE primitives;
 - verified straight/diagonal LoS with explicit unsupported arbitrary-angle traces;
-- deterministic free-cell/taken-cell targeting constraints with explicit incomplete-context results.
+- deterministic free-cell/taken-cell targeting constraints with explicit incomplete-context results;
+- semantic effect-target applicability for the verified self/ally/enemy × summon subset, with raw mask decoding explicitly deferred.
 
 ## `Mapuse` workflow
 
@@ -49,3 +50,4 @@ See:
 - `docs/architecture/AOE.md`
 - `docs/architecture/LOS.md`
 - `docs/architecture/TARGETING.md`
+- `docs/architecture/EFFECT_TARGETING.md`
