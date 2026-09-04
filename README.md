@@ -12,10 +12,11 @@ The current Kernel provides:
 - canonical 14×20 / 560-cell Dofus geometry;
 - immutable duplicate-safe definition registries;
 - deterministic Knowledge Pack manifests/fingerprints;
-- a small `GameKernel` facade exposing `kernel.maps`, `kernel.geometry`, `kernel.range`, `kernel.aoe`, and `kernel.los`;
+- a small `GameKernel` facade exposing `kernel.maps`, `kernel.geometry`, `kernel.range`, `kernel.aoe`, `kernel.los`, and `kernel.targeting`;
 - generic deterministic range/alignment evaluation with explicit typed failures;
 - deterministic point/lozenge/cross/diagonal AoE primitives;
-- verified straight/diagonal LoS with explicit unsupported arbitrary-angle traces.
+- verified straight/diagonal LoS with explicit unsupported arbitrary-angle traces;
+- deterministic free-cell/taken-cell targeting constraints with explicit incomplete-context results.
 
 ## `Mapuse` workflow
 
@@ -47,3 +48,4 @@ See:
 - `docs/architecture/RANGE.md`
 - `docs/architecture/AOE.md`
 - `docs/architecture/LOS.md`
+- `docs/architecture/TARGETING.md`
