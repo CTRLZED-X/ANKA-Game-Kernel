@@ -6,6 +6,7 @@ from pathlib import Path
 from anka_game_kernel.domain.ids import MapId
 from anka_game_kernel.domain.maps import MapDefinition
 from anka_game_kernel.knowledge.pack import KnowledgePack, build_mapuse_knowledge_pack
+from anka_game_kernel.mechanics.aoe.service import AoEService
 from anka_game_kernel.mechanics.geometry.service import GeometryService
 from anka_game_kernel.mechanics.range.service import RangeService
 from anka_game_kernel.registries.base import DefinitionRegistry
@@ -15,6 +16,7 @@ from anka_game_kernel.registries.base import DefinitionRegistry
 class GameKernel:
     knowledge: KnowledgePack
     geometry: GeometryService = field(default_factory=GeometryService)
+    aoe: AoEService = field(default_factory=AoEService)
     range: RangeService = field(default_factory=RangeService)
 
     @classmethod
