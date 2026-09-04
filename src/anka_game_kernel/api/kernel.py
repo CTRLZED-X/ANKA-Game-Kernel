@@ -10,6 +10,7 @@ from anka_game_kernel.mechanics.aoe.service import AoEService
 from anka_game_kernel.mechanics.geometry.service import GeometryService
 from anka_game_kernel.mechanics.los.service import LineOfSightService
 from anka_game_kernel.mechanics.range.service import RangeService
+from anka_game_kernel.mechanics.targeting.service import TargetingService
 from anka_game_kernel.registries.base import DefinitionRegistry
 
 
@@ -20,6 +21,7 @@ class GameKernel:
     aoe: AoEService = field(default_factory=AoEService)
     los: LineOfSightService = field(default_factory=LineOfSightService)
     range: RangeService = field(default_factory=RangeService)
+    targeting: TargetingService = field(default_factory=TargetingService)
 
     @classmethod
     def load(cls, knowledge_pack: KnowledgePack) -> "GameKernel":
