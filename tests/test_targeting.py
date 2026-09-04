@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import pytest
+
 from anka_game_kernel.domain.certainty import Certainty
 from anka_game_kernel.domain.ids import CellId, MapId
 from anka_game_kernel.domain.maps import MapCellDefinition, MapDefinition, MapNeighbors
 from anka_game_kernel.domain.provenance import Provenance, SourceKind, VerificationStatus
 from anka_game_kernel.mechanics.targeting import (
+    EffectTargetClass,
+    EffectTargetContext,
+    EffectTargetFailureReason,
+    EffectTargetSpec,
     TargetCellContext,
     TargetCellFailureReason,
     TargetCellSpec,
@@ -87,10 +93,7 @@ def test_need_free_cell_accepts_walkable_fight_walkable_unoccupied_non_caster() 
 
 def test_need_free_cell_rejects_non_walkable_cell() -> None:
     result = TargetingService().evaluate_cell(
-        _map(_cell(20, walkable=False)),
-        CellId(20),
-        TargetCellSpec(need_free_cell=True),
-        _context(),
+        _map(_cell(20, walkable=False)), CellId(20), TargetCellSpec(need_free_cell=True), _context()
     )
     assert result.legal is False
     assert result.failure is TargetCellFailureReason.CELL_NOT_WALKABLE
@@ -193,3 +196,102 @@ def test_conflicting_free_and_taken_constraints_are_typed_deterministic_failure(
     assert result.legal is False
     assert result.failure is TargetCellFailureReason.CONFLICTING_CELL_REQUIREMENTS
     assert result.certainty is Certainty.DETERMINISTIC
+
+
+def test_effect_target_default_spec_accepts_all_five_common_classes() -> None:
+    service = TargetingService()
+    spec = EffectTargetSpec()
+    cases = (
+        (EffectTargetContext(is_self=True, same_team=None, is_summoned=None), EffectTargetClass.SELF),
+        (EffectTargetContext(is_self=False, same_team=True, is_summoned=False), EffectTargetClass.ALLY_NON_SUMMON),
+        (EffectTargetContext(is_self=False, same_team=True, is_summoned=True), EffectTargetClass.ALLY_SUMMON),
+        (EffectTargetContext(is_self=False, same_team=False, is_summoned=False), EffectTargetClass.ENEMY_NON_SUMMON),
+        (EffectTargetContext(is_self=False, same_team=False, is_summoned=True), EffectTargetClass.ENEMY_SUMMON),
+    )
+    for context, expected_class in cases:
+        result = service.evaluate_effect(spec, context)
+        assert result.affects is True
+        assert result.target_class is expected_class
+        assert result.certainty is Certainty.DETERMINISTIC
+
+
+def test_effect_target_self_does_not_require_team_or_summon_context() -> None:
+    result = TargetingService().evaluate_effect(
+        EffectTargetSpec(allowed_classes=frozenset({EffectTargetClass.SELF})),
+        EffectTargetContext(is_self=True, same_team=None, is_summoned=None),
+    )
+    assert result.affects is True
+    assert result.target_class is EffectTargetClass.SELF
+
+
+def test_effect_target_rejects_class_not_in_semantic_spec() -> None:
+    result = TargetingService().evaluate_effect(
+        EffectTargetSpec(allowed_classes=frozenset({EffectTargetClass.ENEMY_NON_SUMMON})),
+        EffectTargetContext(is_self=False, same_team=True, is_summoned=False),
+    )
+    assert result.affects is False
+    assert result.target_class is EffectTargetClass.ALLY_NON_SUMMON
+    assert result.failure is EffectTargetFailureReason.TARGET_CLASS_NOT_ALLOWED
+
+
+def test_effect_target_reports_missing_team_relation_for_non_self() -> None:
+    result = TargetingService().evaluate_effect(
+        EffectTargetSpec(),
+        EffectTargetContext(is_self=False, same_team=None, is_summoned=False),
+    )
+    assert result.affects is None
+    assert result.certainty is Certainty.DETERMINISTIC_IF_CONTEXT_COMPLETE
+    assert result.missing_inputs == ("same_team",)
+
+
+def test_effect_target_reports_missing_summon_status_for_non_self() -> None:
+    result = TargetingService().evaluate_effect(
+        EffectTargetSpec(),
+        EffectTargetContext(is_self=False, same_team=True, is_summoned=None),
+    )
+    assert result.affects is None
+    assert result.certainty is Certainty.DETERMINISTIC_IF_CONTEXT_COMPLETE
+    assert result.missing_inputs == ("is_summoned",)
+
+
+def test_effect_target_reports_all_missing_non_self_context_in_stable_order() -> None:
+    result = TargetingService().evaluate_effect(
+        EffectTargetSpec(),
+        EffectTargetContext(is_self=False, same_team=None, is_summoned=None),
+    )
+    assert result.affects is None
+    assert result.missing_inputs == ("same_team", "is_summoned")
+
+
+def test_effect_target_empty_allowed_classes_is_deterministically_false_without_relation_context() -> None:
+    result = TargetingService().evaluate_effect(
+        EffectTargetSpec(allowed_classes=frozenset()),
+        EffectTargetContext(is_self=False, same_team=None, is_summoned=None),
+    )
+    assert result.affects is False
+    assert result.target_class is None
+    assert result.failure is EffectTargetFailureReason.NO_TARGET_CLASSES_ALLOWED
+    assert result.certainty is Certainty.DETERMINISTIC
+
+
+def test_effect_target_semantic_spec_can_select_summons_without_encoding_raw_mask_bits() -> None:
+    spec = EffectTargetSpec(
+        allowed_classes=frozenset(
+            {EffectTargetClass.ALLY_SUMMON, EffectTargetClass.ENEMY_SUMMON}
+        )
+    )
+    service = TargetingService()
+    assert service.evaluate_effect(
+        spec, EffectTargetContext(is_self=False, same_team=True, is_summoned=True)
+    ).affects is True
+    assert service.evaluate_effect(
+        spec, EffectTargetContext(is_self=False, same_team=False, is_summoned=True)
+    ).affects is True
+    assert service.evaluate_effect(
+        spec, EffectTargetContext(is_self=False, same_team=False, is_summoned=False)
+    ).affects is False
+
+
+def test_effect_target_spec_rejects_raw_mask_bits_in_semantic_api() -> None:
+    with pytest.raises(TypeError, match="EffectTargetClass"):
+        EffectTargetSpec(allowed_classes=frozenset({1}))  # type: ignore[arg-type]

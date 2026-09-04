@@ -4,7 +4,51 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from anka_game_kernel.domain.certainty import Certainty
+from anka_game_kernel.mechanics.targeting.model import EffectTargetClass
 from anka_game_kernel.results.base import MechanicResult
+
+
+class EffectTargetFailureReason(StrEnum):
+    TARGET_CLASS_NOT_ALLOWED = "target_class_not_allowed"
+    NO_TARGET_CLASSES_ALLOWED = "no_target_classes_allowed"
+
+
+@dataclass(frozen=True, slots=True)
+class EffectTargetResult(MechanicResult):
+    affects: bool | None = None
+    target_class: EffectTargetClass | None = None
+    failure: EffectTargetFailureReason | None = None
+
+    @classmethod
+    def deterministic(
+        cls,
+        *,
+        affects: bool,
+        target_class: EffectTargetClass | None = None,
+        failure: EffectTargetFailureReason | None = None,
+        explanation: str | None = None,
+    ) -> "EffectTargetResult":
+        return cls(
+            certainty=Certainty.DETERMINISTIC,
+            affects=affects,
+            target_class=target_class,
+            failure=failure,
+            explanation=explanation,
+        )
+
+    @classmethod
+    def incomplete(
+        cls,
+        *,
+        missing_inputs: tuple[str, ...],
+        explanation: str,
+    ) -> "EffectTargetResult":
+        return cls(
+            certainty=Certainty.DETERMINISTIC_IF_CONTEXT_COMPLETE,
+            missing_inputs=missing_inputs,
+            affects=None,
+            explanation=explanation,
+        )
 
 
 class TargetCellFailureReason(StrEnum):
