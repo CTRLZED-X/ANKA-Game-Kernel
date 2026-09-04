@@ -12,7 +12,8 @@ The current Kernel provides:
 - canonical 14×20 / 560-cell Dofus geometry;
 - immutable duplicate-safe definition registries;
 - deterministic Knowledge Pack manifests/fingerprints;
-- a small `GameKernel` facade exposing `kernel.maps` and `kernel.geometry`.
+- a small `GameKernel` facade exposing `kernel.maps`, `kernel.geometry`, and `kernel.range`;
+- generic deterministic range/alignment evaluation with explicit typed failures.
 
 ## `Mapuse` workflow
 
@@ -41,3 +42,4 @@ See:
 - `docs/architecture/STATIC_DATA.md`
 - `docs/architecture/GEOMETRY.md`
 - `docs/architecture/KNOWLEDGE_PACK.md`
+- `docs/architecture/RANGE.md`
